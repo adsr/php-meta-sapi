@@ -32,7 +32,7 @@ declare(strict_types=1);
         $history_file = sprintf('.%s-history', basename(__FILE__, '.php'));
         readline_read_history($history_file);
 
-        while (($line = readline('php_meta_sapi > ')) !== false) {
+        while (!in_array(($line = readline('php_meta_sapi > ')), [false, 'quit', 'exit'], true)) {
             $this->ffi->php_request_startup();
 
             if (file_exists($line)) {
