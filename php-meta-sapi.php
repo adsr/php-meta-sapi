@@ -42,7 +42,7 @@ declare(strict_types=1);
 
                 $this->ffi->zend_destroy_file_handle(FFI::addr($fh));
             } else {
-                $code = sprintf('(function() { %s; })()', $line);
+                $code = sprintf("(function() {\n%s;\n})()", $line);
                 $zv = $this->ffi->new('struct zval');
                 $zvp = FFI::addr($zv);
                 $this->ffi->zend_eval_stringl_ex($code, strlen($code), $zvp, 'php_meta_sapi', true);
