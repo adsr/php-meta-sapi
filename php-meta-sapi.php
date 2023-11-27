@@ -83,12 +83,8 @@ declare(strict_types=1);
             // printf("ub_write: %s\n", $str);
             echo $str;
         };
-        $this->module->sapi_error = function() {
-            $args = func_get_args();
-            $type = array_shift($args);
-            $fmt = array_shift($args);
-            array_unshift($params, 'sapi_error');
-            vfprintf(STDERR, "%s(%d): $fmt\n", $type, $args);
+        $this->module->sapi_error = function($type, $fmt) { // TODO variadic
+            fwrite(STDERR, "sapi_error($type): $fmt\n");
         };
         $this->module->send_header = function($hdr, $ctx) {
         };
@@ -169,7 +165,7 @@ declare(strict_types=1);
                 void (*flush)(void *);
                 void *(*get_stat)(void);
                 char *(*getenv)(const char *, size_t);
-                void (*sapi_error)(int, const char *);
+                void (*sapi_error)(int, const char *); // TODO variadic
                 int (*header_handler)(void *, int, void *);
                 int (*send_headers)(void *);
                 void (*send_header)(void *, void *);
