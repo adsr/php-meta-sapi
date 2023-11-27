@@ -131,25 +131,8 @@ declare(strict_types=1);
 
     private function getLibPhpCDefs(): string {
         return <<<EOD
-            struct zend_stream {
-                void *handle;
-                int isatty;
-                void *reader;
-                void *fsizer;
-                void *closer;
-            };
             struct zend_file_handle {
-                union {
-                    void *fp;
-                    struct zend_stream stream;
-                } handle;
-                void *filename;
-                void *opened_path;
-                uint8_t type;
-                uint8_t primary_script;
-                uint8_t in_list;
-                char *buf;
-                size_t len;
+                uint8_t opaque[80];
             };
             struct zval {
                 uint8_t opaque[16];
