@@ -65,7 +65,7 @@ declare(strict_types=1);
     private function initPhpModule(): void {
         $this->module = $this->ffi->new('struct sapi_module_struct');
         FFI::memset(FFI::addr($this->module), 0, FFI::sizeof($this->module));
-        $this->module->name = $this->cString('php_meta_sapi');
+        $this->module->name = $this->cString('meta');
         $this->module->pretty_name = $this->cString('PHP meta-SAPI');
         $this->module->startup = function($module) {
             $this->module->ini_entries = $this->cString(<<<EOD
