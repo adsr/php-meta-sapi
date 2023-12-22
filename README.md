@@ -37,8 +37,9 @@ callbacks.
 I've only tested `php-meta-sapi.php` via the `cli` SAPI, but if you subtract the
 `readline` stuff it should work in other SAPIs as well.
 
-As for when this might be useful, I don't know. It probably isn't useful beyond
-educational content. I wrote it mainly to satisfy a personal curiosity.
+I wrote this mainly to satisfy a personal curiosity. It may not have immediate
+practical uses. One possible use is to invoke ZTS extensions through a non-ZTS
+build. (h/t [@sj-i](https://github.com/sj-i) for that idea.)
 
 Related TODOs:
 
