@@ -4,15 +4,26 @@ declare(strict_types=1);
 
 (new class {
     private ?string $libphp_path = null;
+    private bool $zts = false;
     private ?FFI $ffi = null;
     private ?FFI\CData $module = null;
     private array $free_list = [];
 
     public function run(): void {
+        $this->parseArgs();
         $this->initFfi();
         $this->initPhp();
         $this->loop();
         $this->deinitPhp();
+    }
+
+    private function parseArgs(): void {
+        $opt = getopt('', [
+            'libphp-path:',
+            'zts',
+        ]);
+        $this->libphp_path = $opt['libphp-path'] ?? null;
+        $this->zts = isset($opt['zts']);
     }
 
     private function initFfi(): void {
@@ -23,6 +34,9 @@ declare(strict_types=1);
 
     private function initPhp(): void {
         $this->initPhpModule();
+        if ($this->zts) {
+            $this->ffi->php_tsrm_startup();
+        }
         $this->ffi->zend_signal_startup();
         $this->ffi->sapi_startup(FFI::addr($this->module));
         call_user_func($this->module->startup, FFI::addr($this->module));
@@ -32,6 +46,7 @@ declare(strict_types=1);
         $history_file = sprintf('.%s-history', basename(__FILE__, '.php'));
         readline_read_history($history_file);
 
+        printf("PHP %s sapi=%s zts=%d\n", PHP_VERSION, PHP_SAPI, PHP_ZTS);
         while (!in_array(($line = readline('php_meta_sapi > ')), [false, 'quit', 'exit'], true)) {
             $this->ffi->php_request_startup();
 
@@ -130,7 +145,7 @@ declare(strict_types=1);
     }
 
     private function getLibPhpCDefs(): string {
-        return <<<EOD
+        $cdefs = <<<EOD
             struct zend_file_handle {
                 uint8_t opaque[80];
             };
@@ -190,5 +205,9 @@ declare(strict_types=1);
             void php_var_dump(struct zval *zv, int level);
             const char *zend_zval_type_name(struct zval *zv);
         EOD;
+        if ($this->zts) {
+            $cdefs .= 'void php_tsrm_startup(void);';
+        }
+        return $cdefs;
     }
 })->run();
